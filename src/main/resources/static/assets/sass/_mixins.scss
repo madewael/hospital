@@ -1,0 +1,91 @@
+// =============================================================================
+// String Replace
+// =============================================================================
+
+@function str-replace($string, $search, $replace: "") {
+	$index: str-index($string, $search);
+
+	@if $index {
+		@return str-slice($string, 1, $index - 1) + $replace + str-replace(str-slice($string, $index + str-length($search)), $search, $replace);
+	}
+
+	@return $string;
+}
+
+// =============================================================================
+// Font Face
+// =============================================================================
+
+@mixin font-face($name, $path, $weight: null, $style: null, $exts: eot woff ttf svg) {
+	$src: null;
+
+	$extmods: (
+		eot: "?",
+		svg: "#" + str-replace($name, " ", "_")
+	);
+
+	$formats: (
+		otf: "opentype",
+		ttf: "truetype"
+	);
+
+	@each $ext in $exts {
+		$extmod: if(map-has-key($extmods, $ext), $ext + map-get($extmods, $ext), $ext);
+		$format: if(map-has-key($formats, $ext), map-get($formats, $ext), $ext);
+		$src: append($src, url(quote($path + "." + $extmod)) format(quote($format)), comma);
+	}
+
+	@font-face {
+		font-family: quote($name);
+		font-style: $style;
+		font-weight: $weight;
+		src: $src;
+	}
+}
+
+@mixin blockcenter(){
+
+  margin-left: auto;
+  margin-right: auto;
+}
+
+
+
+@mixin basicformfields(){
+  label {
+	font-size: 1.875rem;
+	margin-bottom: 12px;
+  }
+  label, input, textarea {
+	display: block;
+	width: 100%;
+	box-sizing: border-box;
+	font-family: SourceSansPro-Light, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  }
+  input, textarea {
+	height: 53px;
+	padding: 2px;
+	border: 1px solid #000000;
+	margin-bottom: 30px;
+	font-size: 1.25rem;
+	padding-left: 2%;
+  }
+
+  input[type=submit]{
+	margin-left: auto;
+	margin-right: 0;
+	width: 25%;
+	font-family: tisapro-bold, Georgia, Times, serif;
+	font-size: 1.875rem;
+	background-color: $yellow;
+	color: #FFFFFF;
+	border-style: none;
+	padding: 8px 33px 8px 33px;
+	height: auto;
+	width: auto;
+  }
+  textarea{
+	height: 170px;
+	padding-top: 2%;
+  }
+}

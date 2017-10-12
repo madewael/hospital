@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <title>The Hospital</title>
+    <link rel="stylesheet" type="text/css" href="assets/css/reset.css" />
+    <link rel="stylesheet" type="text/css" href="assets/css/screen.css" />
+
+</head>
+<body>
+
+<h1>HOWEST Hospital</h1>
+
+
+<main>
+    <figure id="hospital">
+        <img src="assets/media/hospital.svg" alt="HOWEST HOSPITAL" title="HOWEST HOSPITAL" />
+        <figcaption>
+            HOWEST HOSPITAL
+            <span>Login</span>
+        </figcaption>
+        <p th:if="${param.error}"  class="interfacemessage">
+            Invalid username and password.
+        </p>
+        <p th:if="${param.logout}"  class="interfacemessage">
+            You have been logged out.
+        </p>
+
+        <form th:action="@{/login}" method="post">
+            <div><label> User Name : <input type="text" name="username"/> </label></div>
+            <div><label> Password: <input type="password" name="password"/> </label></div>
+            <div><input type="submit" value="Sign In"/></div>
+        </form>
+    </figure>
+
+</main>
+
+
+<!-- Only split into different files for readability, no require.js or other inclusion system used to limit overhead -->
+<script type="text/javascript" src="assets/javascript/jquery-3.2.1.js"></script>
+<script type="text/javascript" src="assets/javascript/login.js"></script>
+<!-- https://www.vecteezy.com/vector-art/124057-free-hospital-elements-vector -->
+<!-- <a href="http://www.freepik.com/free-vector/flat-set-of-colored-buildings_1073364.htm">Designed by Freepik</a> -->
+</body>
+</html>
