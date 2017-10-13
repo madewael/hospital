@@ -7,10 +7,13 @@ import be.howest.ti.frameworks.hospital.domain.access.Medical;
 import be.howest.ti.frameworks.hospital.domain.attributes.SocialSecurity;
 import be.howest.ti.frameworks.hospital.domain.bills.Bill;
 import be.howest.ti.frameworks.hospital.domain.services.Appointment;
+import be.howest.ti.frameworks.hospital.domain.services.Stay;
+import be.howest.ti.frameworks.hospital.domain.utils.HospitalException;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -37,6 +40,9 @@ public class Patient extends Person {
         return socialSecurity;
     }
 
+    @OneToOne
+    private Stay currentStay;
+
     public Patient(){}
 
     public Patient(String name, BloodType bt, SocialSecurity ss){
@@ -60,4 +66,21 @@ public class Patient extends Person {
     public void setSocialSecurity(SocialSecurity socialSecurity) {
         this.socialSecurity = socialSecurity;
     }
+
+    public boolean isAdmitted(){
+        return currentStay!=null;
+    }
+
+    public void admit(Stay stay){
+        if ( isAdmitted() ) {
+            throw new HospitalException(this + " is already admitted.");
+        } else {
+            this.currentStay = stay;
+        }
+    }
+
+    public String toString(){
+        return name + "(patient)";
+    }
+
 }

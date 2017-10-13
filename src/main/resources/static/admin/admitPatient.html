@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>The Hospital</title>
-    <link rel="stylesheet" type="text/css" href="/assets/css/reset.css" />
-    <link rel="stylesheet" type="text/css" href="/assets/css/screen.css" />
+    <link rel="stylesheet" type="text/css" href="../assets/css/reset.css" />
+    <link rel="stylesheet" type="text/css" href="../assets/css/screen.css" />
 
 </head>
 <body>
@@ -17,7 +17,7 @@
             HOWEST HOSPITAL
         </figcaption>
         <p id="output" class="interfacemessage"></p>
-        <form id="addPatientForm">
+        <form id="admitPatientForm">
             <label>
                 Patient :
                 <select id="patient"> </select>
@@ -26,14 +26,22 @@
                 Discomfort :
                 <select id="condition"> </select>
             </label>
+            <label>
+                Room Size :
+                <select id="roomSize">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="4">4</option>
+                </select>
+            </label>
             <input type="submit" value="Admit"/>
         </form>
     </figure>
 </main>
 
 <!-- Only split into different files for readability, no require.js or other inclusion system used to limit overhead -->
-<script type="text/javascript" src="/assets/javascript/jquery-3.2.1.js"></script>
-<script type="text/javascript" src="/assets/javascript/admitPatient.js"></script>
+<script type="text/javascript" src="../assets/javascript/jquery-3.2.1.js"></script>
+<script type="text/javascript" src="../assets/javascript/admitPatient.js"></script>
 <!-- https://www.vecteezy.com/vector-art/124057-free-hospital-elements-vector -->
 <!-- <a href="http://www.freepik.com/free-vector/flat-set-of-colored-buildings_1073364.htm">Designed by Freepik</a> -->
 </body>

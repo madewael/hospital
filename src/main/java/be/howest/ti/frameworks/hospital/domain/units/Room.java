@@ -54,4 +54,12 @@ public class Room {
     public int getCapacity() {
         return capacity;
     }
+
+    public String getRoomNumber(){
+        return id;
+    }
+
+    public boolean hasFreeSpace() {
+        return (getCapacity()-getPatientCount())>0;
+    }
 }

@@ -8,9 +8,33 @@ function admitFail(fail){
 
 
 $(function(){
-    var $addPatientForm = $("#admitPatientForm");
+    var $admitPatientForm = $("#admitPatientForm");
     var $selectPatient = $("#patient");
     var $selectCondition = $("#condition");
+    var $selectRoomSize = $("#roomSize");
+
+    $admitPatientForm.submit(function(evt){
+        evt.preventDefault();
+
+        var username = $selectPatient.val();
+        var condition = $selectCondition.val();
+        var roomSize = $selectRoomSize.val();
+
+        $admitPatientForm.find("select").attr("disabled", true);
+        var data = { username : username , condition : condition , roomSize:roomSize};
+        console.log(data);
+
+        $.ajax({
+            url : "/API/patient/admit",
+            method: "POST",
+            data : data,
+            success : admitSuccess
+        }).fail(function( $xhr ) {
+            admitFail( $xhr.responseJSON );
+            $admitPatientForm.find("select").attr("disabled", false);
+        });
+        console.log("loaded",$admitPatientForm)
+    });
 
     function createPatientOption(username, name){
         return $("<option value='"+username+"'>"+ name+ " ("+ username+")</option>");
@@ -28,13 +52,13 @@ $(function(){
         success : addPatients
     });
 
-    function createaddConditionOption(id, name){
-        return $("<option value='\"+id+\"'>"+ name+ "</option>");
+    function createAddConditionOption(id, name){
+        return $("<option value='"+id+"'>"+ name+ "</option>");
     }
 
     function addConditions(data){
         for(var id in data){
-            $selectCondition.append(createaddConditionOption( id , data[id] ));
+            $selectCondition.append(createAddConditionOption( id , data[id] ));
         }
     }
 

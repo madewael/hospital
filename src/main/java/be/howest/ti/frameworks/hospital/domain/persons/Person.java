@@ -15,11 +15,11 @@ public abstract class Person {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private int id;
 
-    private String name;
+    protected String name;
 
-    public Person(){}
+    Person(){}
 
-    public Person(String name){
+    Person(String name){
         this.name = name;
     }
 

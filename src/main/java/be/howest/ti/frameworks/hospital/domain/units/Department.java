@@ -8,6 +8,7 @@ import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 public class Department {
@@ -46,6 +47,10 @@ public class Department {
                 .reduce(0, Integer::sum);
     }
 
+    public String toString(){
+        return "Department of "+getSpecialty().doctor;
+    }
+
 
     public Condition getSpecialty() {
         return specialty;
@@ -56,4 +61,7 @@ public class Department {
         return Collections.unmodifiableList(rooms);
     }
 
+    public List<Room> getRoomsWithFreeSpace() {
+        return getRooms().stream().filter(Room::hasFreeSpace).collect(Collectors.toList());
+    }
 }
