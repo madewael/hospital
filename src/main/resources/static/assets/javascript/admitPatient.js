@@ -13,61 +13,21 @@ $(function(){
     var $selectCondition = $("#condition");
     var $selectRoomSize = $("#roomSize");
 
-    $admitPatientForm.submit(function(evt){
-        evt.preventDefault();
+    initForm($admitPatientForm,{
+        username : $selectPatient,
+        condition : $selectCondition,
+        roomSize : $("#roomSize")
+    },"/API/patient/admit", "POST", admitSuccess, admitFail);
 
-        var username = $selectPatient.val();
-        var condition = $selectCondition.val();
-        var roomSize = $selectRoomSize.val();
 
-        $admitPatientForm.find("select").attr("disabled", true);
-        var data = { username : username , condition : condition , roomSize:roomSize};
-        console.log(data);
 
-        $.ajax({
-            url : "/API/patient/admit",
-            method: "POST",
-            data : data,
-            success : admitSuccess
-        }).fail(function( $xhr ) {
-            admitFail( $xhr.responseJSON );
-            $admitPatientForm.find("select").attr("disabled", false);
-        });
-        console.log("loaded",$admitPatientForm)
+    initSelect($selectPatient, "/API/patients", function(username, name){
+        return {value : username , txt : name + " ("+username+")"};
     });
 
-    function createPatientOption(username, name){
-        return $("<option value='"+username+"'>"+ name+ " ("+ username+")</option>");
-    }
-
-    function addPatients(data){
-        for(var username in data){
-            $selectPatient.append(createPatientOption( username , data[username] ));
-        }
-    }
-
-    $.ajax({
-        url : "/API/patients",
-        method: "GET",
-        success : addPatients
+    initSelect($selectCondition, "/API/conditions", function(id, name){
+        return {value : id , txt : name};
     });
-
-    function createAddConditionOption(id, name){
-        return $("<option value='"+id+"'>"+ name+ "</option>");
-    }
-
-    function addConditions(data){
-        for(var id in data){
-            $selectCondition.append(createAddConditionOption( id , data[id] ));
-        }
-    }
-
-    $.ajax({
-        url : "/API/conditions",
-        method: "GET",
-        success : addConditions
-    });
-
 
 
 });

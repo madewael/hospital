@@ -15,31 +15,9 @@ $(function(){
     var $addPatientForm = $("#addPatientForm");
     var $name = $("#name");
 
-    console.log($addPatientForm);
+    initForm($addPatientForm,{
+        name : $name
+    },"/API/patient", "POST", registerSuccess, registerFail);
 
-    $addPatientForm.submit( function(evt){
-        evt.preventDefault();
-
-        var name = $name.val();
-        $name.val("");
-
-        var $theForm = $(this);
-        $theForm.find("input").attr("disabled", true);
-
-        $output.html("registering : "+name);
-
-        $.ajax({
-            url:"/API/patient",
-            method : "POST",
-            data : { "name" : name },
-            success : registerSuccess
-        }).fail(function( $xhr ) {
-            registerFail( $xhr.responseJSON );
-            $theForm.find("input").attr("disabled", false);
-        });
-
-    });
-
-    console.log("loaded...");
 
 });
