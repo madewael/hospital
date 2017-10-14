@@ -17,7 +17,7 @@ public aspect LoggerAspect {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
 
-    pointcut personGetters()  : execution(* be.howest.ti.frameworks.hospital.domain..*.get*());
+    pointcut patientGetters()  : execution(* be.howest.ti.frameworks.hospital.domain.persons.Patient.getSocialSecurity());
 
 
     private Object clean(Object obj){
@@ -34,14 +34,13 @@ public aspect LoggerAspect {
         }
     }
 
+
     int i =0;
-    Object around(): personGetters() {
-        log.info("A getter was called:"+ thisJoinPoint.getSignature());
+    Object around(): patientGetters() {
+        log.info("A getter for SS was called:"+ thisJoinPoint.getSignature());
         Object res = proceed();
 
-        i++;
-        if (false) return clean(res);
-        else return res;
+        return null;
 
     }
 
