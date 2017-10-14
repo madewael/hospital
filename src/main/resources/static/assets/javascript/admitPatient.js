@@ -8,15 +8,15 @@ function admitFail(fail){
 
 
 $(function(){
-    var $admitPatientForm = $("#admitPatientForm");
-    var $selectPatient = $("#patient");
-    var $selectCondition = $("#condition");
-    var $selectRoomSize = $("#roomSize");
+    const $admitPatientForm = $("#admitPatientForm");
+    const $selectPatient = $("#patient");
+    const $selectCondition = $("#condition");
+    const $selectRoomSize = $("#roomSize");
 
     initForm($admitPatientForm,{
         username : $selectPatient,
         condition : $selectCondition,
-        roomSize : $("#roomSize")
+        roomSize : $selectRoomSize
     },"/API/patient/admit", "POST", admitSuccess, admitFail);
 
 
@@ -25,8 +25,8 @@ $(function(){
         return {value : username , txt : name + " ("+username+")"};
     });
 
-    initSelect($selectCondition, "/API/conditions", function(id, name){
-        return {value : id , txt : name};
+    initSelect($selectCondition, "/API/conditions", function(id, condition){
+        return {value : id , txt : condition.symptom};
     });
 
 

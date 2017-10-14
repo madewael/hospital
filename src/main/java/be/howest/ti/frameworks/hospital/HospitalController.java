@@ -117,20 +117,24 @@ public class HospitalController {
     }
 
     @GetMapping("/doctors")
-    public Map<String,Doctor> listDoctors() {
-        Map<String,Doctor> res = new HashMap<>();
+    public Map<String,Object> listDoctors() {
+        Map<String,Object> res = new HashMap<>();
         for(User u : users.findAll(User::isDoctor) ) {
             Doctor d = u.getDoctor();
-            res.put(u.getUserName(), d);
+            res.put(u.getUserName(), new Object(){
+                public String getName(){ return d.getName(); }
+                public String getSpecialty() { return d.getSpecialty().getDoctor(); }
+            });
         }
         return res;
     }
 
+
     @GetMapping("/conditions")
-    public Map<Integer,String> listConditions() {
-        Map<Integer,String> res = new HashMap<>();
+    public Map<Integer,Condition> listConditions() {
+        Map<Integer,Condition> res = new HashMap<>();
         for(Condition d : Condition.values() ) {
-            res.put( d.ordinal() , d.symptom );
+            res.put( d.ordinal() , d );
         }
         return res;
     }

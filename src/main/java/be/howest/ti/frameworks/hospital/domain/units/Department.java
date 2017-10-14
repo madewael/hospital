@@ -28,7 +28,7 @@ public class Department {
     }
 
     public Room addRoom(int capacity){
-        Room r = new Room(specialty.doctor+"_"+rooms.size(),capacity);
+        Room r = new Room(specialty.getDoctor()+"_"+rooms.size(),capacity);
         rooms.add(r);
         return r;
     }
@@ -48,7 +48,7 @@ public class Department {
     }
 
     public String toString(){
-        return "Department of "+getSpecialty().doctor;
+        return "Department of "+getSpecialty().getDoctor();
     }
 
 

@@ -11,7 +11,7 @@ function ownProperties(obj){
             res.push(k);
         }
     }
-    return k;
+    return res;
 }
 
 function initSelect($select, url, convertDataToValueAndText){
@@ -22,7 +22,7 @@ function initSelect($select, url, convertDataToValueAndText){
             ownProperties(data)
                 .map(id => convertDataToValueAndText(id,data[id]))
                 .map(kv => $("<option value='"+kv.value+"'>"+ kv.txt + "</option>"))
-                .forEach( $option => $select.append( option ) );
+                .forEach( $option => $select.append( $option ) );
         }
     });
 }
