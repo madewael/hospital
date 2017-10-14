@@ -1,10 +1,5 @@
 package be.howest.ti.frameworks.hospital.domain.persons;
 
-import be.howest.ti.frameworks.hospital.data.UserRepository;
-import be.howest.ti.frameworks.hospital.data.UserServices;
-import be.howest.ti.frameworks.hospital.domain.access.Admin;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import javax.persistence.*;
 
 @MappedSuperclass

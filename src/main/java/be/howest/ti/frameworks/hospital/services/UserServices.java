@@ -1,17 +1,22 @@
-package be.howest.ti.frameworks.hospital.data;
+package be.howest.ti.frameworks.hospital.services;
 
+import be.howest.ti.frameworks.hospital.data.AppointmentRepository;
+import be.howest.ti.frameworks.hospital.data.UserRepository;
+import be.howest.ti.frameworks.hospital.domain.persons.Doctor;
 import be.howest.ti.frameworks.hospital.domain.persons.Person;
 import be.howest.ti.frameworks.hospital.domain.persons.User;
+import be.howest.ti.frameworks.hospital.domain.services.Appointment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
 @Component
 public class UserServices {
-
 
     private final UserRepository users;
 
@@ -21,11 +26,11 @@ public class UserServices {
 
     }
 
-    public User save(User u) {
+    User save(User u) {
         return users.save(u);
     }
 
-    public User findOne(String userName) {
+    User findOne(String userName) {
         return users.findOne(userName);
     }
 
@@ -38,8 +43,8 @@ public class UserServices {
         return null;
     }
 
-    public List<User> findAll(Predicate<User> keep){
-        List<User> lst = new ArrayList();
+    List<User> findAll(Predicate<User> keep){
+        List<User> lst = new ArrayList<>();
         for( User u : users.findAll()){
             if (keep.test(u)){
                 lst.add(u);
@@ -48,7 +53,7 @@ public class UserServices {
         return lst;
     }
 
-    public String createUsername(String name){
+    String createUsername(String name){
         String usernameBase = name.toLowerCase().replaceAll("\\s+","");
         String username = usernameBase;
 
@@ -61,5 +66,6 @@ public class UserServices {
 
         return username;
     }
+
 
 }

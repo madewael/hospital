@@ -1,4 +1,4 @@
-package be.howest.ti.frameworks.hospital;
+package be.howest.ti.frameworks.hospital.controllers;
 
 import be.howest.ti.frameworks.hospital.data.*;
 import be.howest.ti.frameworks.hospital.domain.attributes.BloodType;
@@ -13,6 +13,7 @@ import be.howest.ti.frameworks.hospital.domain.services.Stay;
 import be.howest.ti.frameworks.hospital.domain.units.Department;
 import be.howest.ti.frameworks.hospital.domain.units.Room;
 import be.howest.ti.frameworks.hospital.domain.utils.HospitalException;
+import be.howest.ti.frameworks.hospital.services.HospitalService;
 import javassist.bytecode.DeprecatedAttribute;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -27,80 +28,24 @@ import java.util.*;
 @RequestMapping("/API")
 public class HospitalController {
 
-    private final PatientRepository patients;
-    private final UserServices users;
-    private final DoctorRepository doctors;
-    private final DepartmentRepository departments;
-    private final RoomRepository rooms;
-    private final StayRepository stays;
+    private final HospitalService hospital;
 
     @Autowired
-    HospitalController(
-            PatientRepository patients,
-            UserServices users,
-            DoctorRepository doctors,
-            DepartmentRepository departments,
-            RoomRepository rooms,
-            StayRepository stays) {
-        this.patients = patients;
-        this.users = users;
-        this.doctors = doctors;
-        this.departments = departments;
-        this.rooms = rooms;
-        this.stays = stays;
-
-        createPatient("Alice Armageddon");
-        createPatient("Bob Brusseels");
-        createPatient("Carol Cardoen");
-        createPatient("Bob Brusseels");
-
-        createDoctor("House", "BLOOD");
-        createDoctor("Jos", "BLOOD");
-
-
-        for(Condition d : Condition.values()){
-            Department dep = new Department(d);
-            if (d==Condition.BLOOD){
-                rooms.save(dep.addRoom(1));
-            } else if (d==Condition.EYE){
-                rooms.save(dep.addRoom(0));
-            } else {
-
-                rooms.save(dep.addRoom(1));
-                rooms.save(dep.addRoom(1));
-
-                rooms.save(dep.addRoom(2));
-                rooms.save(dep.addRoom(2));
-                rooms.save(dep.addRoom(2));
-                rooms.save(dep.addRoom(2));
-
-                rooms.save(dep.addRoom(4));
-                rooms.save(dep.addRoom(4));
-
-
-            }
-            departments.save(dep);
-        }
-
+    HospitalController(HospitalService hospital) {
+        this.hospital = hospital;
     }
 
     @InitBinder
     public void initBinder(WebDataBinder binder){
         binder.registerCustomEditor(       Date.class,
                 new CustomDateEditor(new SimpleDateFormat("yyyy-MM-dd"), true, 10));
-    }
 
-
-    @GetMapping("/tests")
-    public List<String> listTestStrings() {
-        String extra = "nope";
-        return Arrays.asList("test1", "test2", extra);
     }
 
     @GetMapping("/currentUser")
     public Person getCurrentUser(Principal p) {
         if (p!=null && p.getName() != null) {
-            User u = users.findOne(p.getName());
+            User u = hospital.findUser(p.getName());
             return u.getPerson();
         } else {
             return null;
@@ -110,7 +55,7 @@ public class HospitalController {
     @GetMapping("/patients")
     public Map<String,String> listPatients() {
         Map<String,String> res = new HashMap<>();
-        for(User u : users.findAll(User::isPatient) ) {
+        for(User u : hospital.findAllPatients() ) {
             res.put(u.getUserName(),u.getPerson().getName());
         }
         return res;
@@ -119,7 +64,7 @@ public class HospitalController {
     @GetMapping("/doctors")
     public Map<String,Object> listDoctors() {
         Map<String,Object> res = new HashMap<>();
-        for(User u : users.findAll(User::isDoctor) ) {
+        for(User u : hospital.findAllDoctors() ) {
             Doctor d = u.getDoctor();
             res.put(u.getUserName(), new Object(){
                 public String getName(){ return d.getName(); }
@@ -144,24 +89,18 @@ public class HospitalController {
         if (name==null || name.length()<1){
             throw new HospitalException("Cannot create patient with an empty name");
         }
-
-        Patient p = new Patient(name, BloodType.UNKNOWN, SocialSecurity.A);
-        String username = users.createUsername(name);
-        User u = new User(username, username + "123", p);
-
-        patients.save(p);
-
-        return users.save(u);
+        return hospital.createPatient(name);
     }
 
     @PostMapping("/doctor")
-    public User createDoctor(@RequestParam String name,@RequestParam String specialty) {
+    public User createDoctor(@RequestParam String name, @RequestParam String specialty) {
+        if (name==null || name.length()<1){
+            throw new HospitalException("Cannot create doctor with an empty name");
+        }
         Condition c = Condition.parse(specialty);
-        Doctor d = new Doctor(name, c);
-        User u = new User(name, name + "123", d);
 
-        doctors.save(d);
-        return users.save(u);
+        return hospital.createDoctor(name, c);
+
     }
 
     @PatchMapping("/patients/{userName}/blood/{bloodType}")
@@ -171,8 +110,7 @@ public class HospitalController {
     ) {
         Patient p = findPatient(userName);
         BloodType bt = BloodType.parse(bloodType);
-        p.setBloodType(bt);
-        return patients.save(p);
+        return hospital.updateBloodType(p,bt);
     }
 
     @PostMapping("/patient/admit")
@@ -182,36 +120,8 @@ public class HospitalController {
             @RequestParam final int roomSize
     ) {
         Patient p = findPatient(username);
-
-        if (p.isAdmitted()){
-            throw new HospitalException(p + " is already admitted.");
-        }
-
-
         Condition c = Condition.values()[condition];
-        Department d = departments.findOne(c);
-
-        List<Room> roomsWithFreeSpace = d.getRoomsWithFreeSpace();
-
-        if (roomsWithFreeSpace.size()<=0){
-            throw new HospitalException("No more free rooms in the department of " + d);
-        }
-
-        Set<Integer> capacitiesOfRoomWithFreeSpace = new HashSet<>();
-        for(Room m : roomsWithFreeSpace){
-
-            if (m.getCapacity()==roomSize){
-                Stay s = new Stay(m);
-                p.admit(s);
-                stays.save(s);
-                patients.save(p);
-                return s;
-            } else {
-                capacitiesOfRoomWithFreeSpace.add(m.getCapacity());
-            }
-
-        }
-        throw new HospitalException("No more rooms with the requested size. Available sizes are "+ capacitiesOfRoomWithFreeSpace);
+        return hospital.admitPatient(p,c,roomSize);
     }
 
     @PostMapping("/patient/appointment")
@@ -223,7 +133,7 @@ public class HospitalController {
     ) {
         Patient p = findPatient(patient);
         Doctor d = findDoctor(doctor);
-        return new Appointment(p, d, date);
+        return hospital.makeAppointment(p,d,date);
     }
 
     @PatchMapping("/patients/{userName}/social/{social}")
@@ -233,13 +143,12 @@ public class HospitalController {
     ) {
         Patient p = findPatient(userName);
         SocialSecurity ss = SocialSecurity.parse(social);
-        p.setSocialSecurity(ss);
-        return patients.save(p);
+        return hospital.updateSocialSecurity(p,ss);
     }
 
     @GetMapping("/patients/{userName}")
     public Patient findPatient(@PathVariable final String userName) {
-        User u = users.findOne(userName);
+        User u = hospital.findUser(userName);
         if (u == null || !u.isPatient())
             throw new HospitalException("Could not find the needed patient:"+userName);
         return u.getPatient();
@@ -247,10 +156,20 @@ public class HospitalController {
 
     @GetMapping("/doctors/{userName}")
     public Doctor findDoctor(@PathVariable final String userName) {
-        User u = users.findOne(userName);
+        User u = hospital.findUser(userName);
         if (u == null || !u.isDoctor())
-            throw new HospitalException("Could not find the needed doctor");
+            throw new HospitalException("Could not find the needed doctor:"+userName);
         return u.getDoctor();
+    }
+
+
+    @GetMapping("/doctors/{userName}/appointments")
+    public List<Appointment> getAppointmentsForDoctor(
+            @PathVariable final String userName
+    ) {
+        Doctor d = findDoctor(userName);
+
+        return hospital.getAppointmentsForDoctor(d);
     }
 
 }

@@ -11,7 +11,7 @@ public class Appointment {
 
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
-    private long id;
+    private int id;
 
     @ManyToOne
     private Patient patient;

@@ -1,4 +1,4 @@
-package be.howest.ti.frameworks.hospital;
+package be.howest.ti.frameworks.hospital.controllers;
 
 import be.howest.ti.frameworks.hospital.domain.persons.Person;
 import org.springframework.context.annotation.Scope;

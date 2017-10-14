@@ -1,4 +1,4 @@
-package be.howest.ti.frameworks.hospital;
+package be.howest.ti.frameworks.hospital.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
