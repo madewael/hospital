@@ -193,7 +193,7 @@ public class HospitalController {
             throw new HospitalException("No more free rooms in the department of " + d);
         }
 
-        Set<Integer> capacitiesOfRoomWithFreeSpace = new HashSet();
+        Set<Integer> capacitiesOfRoomWithFreeSpace = new HashSet<>();
         for(Room m : roomsWithFreeSpace){
 
             if (m.getCapacity()==roomSize){
