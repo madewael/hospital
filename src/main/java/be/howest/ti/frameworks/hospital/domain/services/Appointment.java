@@ -3,15 +3,14 @@ package be.howest.ti.frameworks.hospital.domain.services;
 import be.howest.ti.frameworks.hospital.domain.persons.Doctor;
 import be.howest.ti.frameworks.hospital.domain.persons.Patient;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.util.Date;
 
 @Entity
 public class Appointment {
 
     @Id
+    @GeneratedValue(strategy= GenerationType.AUTO)
     private long id;
 
     @ManyToOne
@@ -22,9 +21,16 @@ public class Appointment {
 
     private Date date;
 
+
+    public Appointment(){}
+    public Appointment(Patient patient, Doctor doctor, Date date) {
+        this.patient = patient;
+        this.doctor = doctor;
+        this.date =  (Date)date.clone();
+    }
+
     public Doctor getDoctor(){
-        // TODO: 10/10/17 replace by field
-        return null;
+        return doctor;
     }
 
     public Patient getPatient() {

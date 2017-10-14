@@ -8,15 +8,19 @@ import be.howest.ti.frameworks.hospital.domain.persons.Doctor;
 import be.howest.ti.frameworks.hospital.domain.persons.Patient;
 import be.howest.ti.frameworks.hospital.domain.persons.Person;
 import be.howest.ti.frameworks.hospital.domain.persons.User;
+import be.howest.ti.frameworks.hospital.domain.services.Appointment;
 import be.howest.ti.frameworks.hospital.domain.services.Stay;
 import be.howest.ti.frameworks.hospital.domain.units.Department;
 import be.howest.ti.frameworks.hospital.domain.units.Room;
 import be.howest.ti.frameworks.hospital.domain.utils.HospitalException;
 import javassist.bytecode.DeprecatedAttribute;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @RestController
@@ -80,6 +84,12 @@ public class HospitalController {
 
     }
 
+    @InitBinder
+    public void initBinder(WebDataBinder binder){
+        binder.registerCustomEditor(       Date.class,
+                new CustomDateEditor(new SimpleDateFormat("yyyy-MM-dd"), true, 10));
+    }
+
 
     @GetMapping("/tests")
     public List<String> listTestStrings() {
@@ -102,6 +112,16 @@ public class HospitalController {
         Map<String,String> res = new HashMap<>();
         for(User u : users.findAll(User::isPatient) ) {
             res.put(u.getUserName(),u.getPerson().getName());
+        }
+        return res;
+    }
+
+    @GetMapping("/doctors")
+    public Map<String,Doctor> listDoctors() {
+        Map<String,Doctor> res = new HashMap<>();
+        for(User u : users.findAll(User::isDoctor) ) {
+            Doctor d = u.getDoctor();
+            res.put(u.getUserName(), d);
         }
         return res;
     }
@@ -188,6 +208,18 @@ public class HospitalController {
 
         }
         throw new HospitalException("No more rooms with the requested size. Available sizes are "+ capacitiesOfRoomWithFreeSpace);
+    }
+
+    @PostMapping("/patient/appointment")
+    public Appointment makeAppointment(
+            @RequestParam final String patient,
+            @RequestParam final String doctor,
+            @RequestParam final Date date
+
+    ) {
+        Patient p = findPatient(patient);
+        Doctor d = findDoctor(doctor);
+        return new Appointment(p, d, date);
     }
 
     @PatchMapping("/patients/{userName}/social/{social}")
