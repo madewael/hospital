@@ -5,7 +5,7 @@ import be.howest.ti.frameworks.hospital.domain.attributes.Condition;
 import javax.persistence.Entity;
 
 @Entity
-public class Doctor extends Employee {
+public class Doctor extends Person {
 
     private Condition specialty;
 
@@ -21,8 +21,8 @@ public class Doctor extends Employee {
 
     public Doctor(){}
 
-    public Doctor(String name, Condition specialty){
-        super(name);
+    public Doctor(String userName, String password, String name, Condition specialty){
+        super(userName,password,name);
         this.specialty = specialty;
     }
 

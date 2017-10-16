@@ -10,10 +10,7 @@ import be.howest.ti.frameworks.hospital.domain.services.Appointment;
 import be.howest.ti.frameworks.hospital.domain.services.Stay;
 import be.howest.ti.frameworks.hospital.domain.utils.HospitalException;
 
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -45,8 +42,8 @@ public class Patient extends Person {
 
     public Patient(){}
 
-    public Patient(String name, BloodType bt, SocialSecurity ss){
-        super(name);
+    public Patient(String userName, String password, String name, BloodType bt, SocialSecurity ss){
+        super(userName,password,name);
         this.bloodType = bt;
         this.socialSecurity = ss;
         appointments = new ArrayList<>();

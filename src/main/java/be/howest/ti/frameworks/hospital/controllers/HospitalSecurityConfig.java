@@ -25,7 +25,8 @@ public class HospitalSecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests().antMatchers("/","/index.html","/assets/**").permitAll().and()
                 //.authorizeRequests().antMatchers("/API/**").hasRole("patient").and()
                 .formLogin().loginPage("/login").permitAll().and()
-                .logout().logoutRequestMatcher(new AntPathRequestMatcher("/logout")).logoutSuccessUrl("/login").and()
+                .logout().logoutRequestMatcher(new AntPathRequestMatcher("/logout")).logoutSuccessUrl("/login")
+                .and()
                 .csrf().disable();
     }
 
@@ -33,15 +34,7 @@ public class HospitalSecurityConfig extends WebSecurityConfigurerAdapter {
             "SELECT user_name , password, true as enabled from db_spring_hospital.user where `user_name` = ?;";
 
     private static final String SQL_AUTHORITIES_BY_USERNAME_QUERY =
-            "SELECT\n" +
-                    "user_name,\n" +
-                    "CONCAT(\n" +
-                    "CASE WHEN patient_id IS NOT NULL THEN \"patient\" ELSE \"\" END,\n" +
-                    "CASE WHEN doctor_id IS NOT NULL THEN \"doctor\" ELSE \"\" END,\n" +
-                    "CASE WHEN administrator_id IS NOT NULL THEN \"admin\" ELSE \"\" END\n" +
-                    ") as role\n" +
-                    "FROM db_spring_hospital.user\n" +
-                    "WHERE user_name = ?";
+            "SELECT user_name , user_type as role from db_spring_hospital.user where `user_name` = ?;";
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {

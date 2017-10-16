@@ -4,6 +4,7 @@ import be.howest.ti.frameworks.hospital.data.*;
 import be.howest.ti.frameworks.hospital.domain.attributes.BloodType;
 import be.howest.ti.frameworks.hospital.domain.attributes.Condition;
 import be.howest.ti.frameworks.hospital.domain.attributes.SocialSecurity;
+import be.howest.ti.frameworks.hospital.domain.persons.Administrator;
 import be.howest.ti.frameworks.hospital.domain.persons.Doctor;
 import be.howest.ti.frameworks.hospital.domain.persons.Patient;
 import be.howest.ti.frameworks.hospital.domain.persons.User;
@@ -26,6 +27,7 @@ public class HospitalService {
 
     private final PatientRepository patients;
     private final UserServices users;
+    private final AdminRepository admins;
     private final DoctorRepository doctors;
     private final DepartmentRepository departments;
     private final RoomRepository rooms;
@@ -36,6 +38,7 @@ public class HospitalService {
     HospitalService(PatientRepository patients,
                        UserServices users,
                        DoctorRepository doctors,
+                    AdminRepository admins,
                        DepartmentRepository departments,
                        RoomRepository rooms,
                        StayRepository stays,
@@ -43,21 +46,24 @@ public class HospitalService {
         this.patients = patients;
         this.users = users;
         this.doctors = doctors;
+        this.admins = admins;
         this.departments = departments;
         this.rooms = rooms;
         this.stays = stays;
         this.appointments = appointments;
 
-        populateWithTestData();
+        //populateWithTestData();
     }
 
     private void populateWithTestData(){
-        User a = createPatient("Alice Armageddon");
+
+
+        Patient a = createPatient("Alice Armageddon");
         createPatient("Bob Brusseels");
         createPatient("Carol Cardoen");
         createPatient("Bob Brusseels");
 
-        User house = createDoctor("House", Condition.BLOOD);
+        Doctor house = createDoctor("House", Condition.BLOOD);
         createDoctor("Jos", Condition.BLOOD);
 
 
@@ -83,33 +89,37 @@ public class HospitalService {
 
             }
             departments.save(dep);
+
+            admins.save(createAdmin("root"));
+
         }
 
         Date now = new Date();
         for(int i=-5 ; i<5 ; i++){
             Date time = new Date( System.currentTimeMillis() + i*TimeUnit.HOURS.toMillis(1));
-            makeAppointment(a.getPatient(),house.getDoctor(),time);
+            makeAppointment(a,house,time);
         }
 
 
 
     }
 
-    public User createDoctor(String name, Condition specialty) {
-        Doctor d = new Doctor(name, specialty);
-        User u = new User(name, name + "123", d);
-
-        doctors.save(d);
-        return users.save(u);
+    public Doctor createDoctor(String name, Condition specialty) {
+        String username = users.createUsername(name);
+        Doctor d = new Doctor(username,username+"123",name, specialty);
+        return doctors.save(d);
     }
 
-    public User createPatient(String name) {
-        Patient p = new Patient(name, BloodType.UNKNOWN, SocialSecurity.A);
+    public Administrator createAdmin(String name) {
         String username = users.createUsername(name);
-        User u = new User(username, username + "123", p);
+        Administrator d = new Administrator(username,username+"123",name);
+        return admins.save(d);
+    }
 
-        patients.save(p);
-        return users.save(u);
+    public Patient createPatient(String name) {
+        String username = users.createUsername(name);
+        Patient p = new Patient(username, username+"123",name, BloodType.UNKNOWN, SocialSecurity.A);
+        return (Patient) users.save(p);
     }
 
     public Stay admitPatient(Patient p, Condition c, int roomSize){
@@ -145,17 +155,12 @@ public class HospitalService {
         throw new HospitalException("No more rooms with the requested size. Available sizes are "+ capacitiesOfRoomWithFreeSpace);
     }
 
-
-    public User findUser(String username){
-        return users.findOne(username);
+    public Iterable<Doctor> findAllDoctors(){
+        return doctors.findAll();
     }
 
-    public List<User> findAllDoctors(){
-        return users.findAll(User::isDoctor);
-    }
-
-    public List<User> findAllPatients(){
-        return users.findAll(User::isPatient);
+    public Iterable<Patient> findAllPatients(){
+        return patients.findAll();
     }
 
     public Patient updateSocialSecurity(Patient p, SocialSecurity ss) {
@@ -175,5 +180,21 @@ public class HospitalService {
 
     public List<Appointment> getAppointmentsForDoctor(Doctor d) {
         return appointments.findRelevantAppointments(d);
+    }
+
+    public User findUser(String username) {
+        return users.findOne(username);
+    }
+
+    public Doctor findDoctor(String userName) {
+        return doctors.findOne(userName);
+    }
+
+    public Patient findPatient(String userName) {
+        return patients.findOne(userName);
+    }
+
+    public Administrator findAdmin(String userName) {
+        return admins.findOne(userName);
     }
 }
